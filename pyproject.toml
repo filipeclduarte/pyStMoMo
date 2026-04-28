@@ -51,10 +51,10 @@ dev = [
 all = ["pystmomo[dev,docs,parallel]"]
 
 [project.urls]
-Homepage = "https://github.com/filipeduarte/pyStMoMo"
-Documentation = "https://filipeduarte.github.io/pyStMoMo"
-Repository = "https://github.com/filipeduarte/pyStMoMo"
-Issues = "https://github.com/filipeduarte/pyStMoMo/issues"
+Homepage = "https://github.com/filipeclduarte/pyStMoMo"
+Documentation = "https://filipeclduarte.github.io/pyStMoMo"
+Repository = "https://github.com/filipeclduarte/pyStMoMo"
+Issues = "https://github.com/filipeclduarte/pyStMoMo/issues"
 
 [tool.hatch.version]
 path = "src/pystmomo/_version.py"
