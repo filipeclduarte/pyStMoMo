@@ -87,14 +87,20 @@ def _cohort_index_matrix(
         Shape (n_ages, n_years).  Cells where cohort is outside *cohorts* are
         set to 0.0 (will be masked by wxt).
     """
-    cohort_to_gc = dict(zip(cohorts.tolist(), gc.tolist(), strict=False))
-    mat = np.zeros((len(ages), len(years)))
-    for j, yr in enumerate(years):
-        for i, age in enumerate(ages):
-            c = int(yr) - int(age)
-            if c in cohort_to_gc:
-                mat[i, j] = cohort_to_gc[c]
-    return mat
+    # Vectorised: build a lookup array indexed by cohort value
+    c_min = int(cohorts[0])
+    c_max = int(cohorts[-1])
+    n_lookup = c_max - c_min + 2  # +1 for range, +1 for sentinel
+    # Pad with a zero sentinel at the end for out-of-range cohorts
+    gc_lookup = np.zeros(n_lookup)
+    gc_lookup[:len(gc)] = gc
+
+    cohort_grid = years[None, :] - ages[:, None]  # (n_ages, n_years)
+    idx = (cohort_grid - c_min).astype(int)
+    # Map out-of-range indices to the sentinel (last element = 0.0)
+    sentinel = n_lookup - 1
+    idx = np.where((idx >= 0) & (idx < len(gc)), idx, sentinel)
+    return gc_lookup[idx]
 
 
 def compute_rates(

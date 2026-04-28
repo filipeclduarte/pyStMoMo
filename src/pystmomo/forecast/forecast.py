@@ -219,38 +219,44 @@ def _compute_forecast_rates(
         eta += fit.bx @ kt_f      # (n_ages, N) @ (N, h)
 
     if fit.model.has_cohort and fit.b0x is not None:
-        # Build gc_full: dict covering both observed and forecast cohorts
-        gc_full = _build_gc_dict(fit, cohorts_f, gc_f)
-        # Fill in cohort contribution cell-by-cell
-        coh_contribution = np.zeros((n_ages, h))
-        for j, yr in enumerate(years_f):
-            for i, age in enumerate(ages):
-                c = int(yr) - int(age)
-                if c in gc_full:
-                    coh_contribution[i, j] = gc_full[c]
-        eta += fit.b0x[:, None] * coh_contribution
+        # Build combined gc array covering observed + forecast cohorts
+        all_cohorts, all_gc = _build_gc_arrays(fit, cohorts_f, gc_f)
+        if len(all_cohorts) > 0:
+            c_min = int(all_cohorts[0])
+            # Padded lookup: sentinel at end for out-of-range cohorts
+            gc_lookup = np.append(all_gc, 0.0)
+            cohort_grid = years_f[None, :] - ages[:, None]  # (n_ages, h)
+            idx = (cohort_grid - c_min).astype(int)
+            sentinel = len(all_gc)
+            idx = np.where((idx >= 0) & (idx < len(all_gc)), idx, sentinel)
+            eta += fit.b0x[:, None] * gc_lookup[idx]
 
     # No offset for future rates
     rates = compute_rates(eta, fit.model.link)
     return rates
 
 
-def _build_gc_dict(
+def _build_gc_arrays(
     fit: FitStMoMo,
     cohorts_f: np.ndarray,
     gc_f: np.ndarray | None,
-) -> dict:
-    """Return a dict mapping cohort year → gc value.
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return sorted (cohorts, gc_values) covering observed + forecast cohorts.
 
-    Includes both observed and (if present) forecast cohorts.
+    Observed cohorts with non-finite gc values are excluded.
     """
-    gc_dict: dict = {}
     # Observed cohorts
-    for c, g in zip(fit.cohorts.tolist(), fit.gc.tolist(), strict=False):
-        if np.isfinite(g):
-            gc_dict[int(c)] = g
-    # Forecast cohorts
+    finite_mask = np.isfinite(fit.gc)
+    obs_c = fit.cohorts[finite_mask]
+    obs_g = fit.gc[finite_mask]
+
     if gc_f is not None and len(cohorts_f) > 0:
-        for c, g in zip(cohorts_f.tolist(), gc_f.tolist(), strict=False):
-            gc_dict[int(c)] = g
-    return gc_dict
+        all_c = np.concatenate([obs_c, cohorts_f])
+        all_g = np.concatenate([obs_g, gc_f])
+    else:
+        all_c = obs_c
+        all_g = obs_g
+
+    # Sort by cohort value (should already be sorted, but ensure it)
+    order = np.argsort(all_c)
+    return all_c[order], all_g[order]

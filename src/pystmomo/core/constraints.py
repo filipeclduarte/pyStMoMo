@@ -153,11 +153,14 @@ def _m7_constraint(
         A = np.column_stack([np.ones_like(c_idx), c_idx, c_idx ** 2])
         coef, _, _, _ = np.linalg.lstsq(A, gc, rcond=None)
         gc -= A @ coef
-        # Redistribute into period indexes
-        years.astype(float) - years.mean()
-        kt[0] += coef[0] + coef[1] * years.astype(float) + coef[2] * years.astype(float) ** 2
-        # (The exact redistribution depends on the M7 predictor structure;
-        #  this approximation preserves the linear predictor η_xt.)
+        # Redistribute absorbed polynomial into period indexes.
+        # Cohort c = t - x.  The M7 age functions are:
+        #   β^(1)(x) = 1,  β^(2)(x) = x - x̄,  β^(3)(x) = (x-x̄)² - σ²_x
+        # The cohort polynomial a₀ + a₁·c + a₂·c² with c = t - x decomposes
+        # as a function of t that must be absorbed into the κ_t series.
+        # For the constant age function (β=1), all t-dependent terms go to κ_t^(1):
+        t = years.astype(float)
+        kt[0] += coef[0] + coef[1] * t + coef[2] * t ** 2
 
     return ax, bx, kt, b0x, gc
 

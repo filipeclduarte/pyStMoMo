@@ -13,8 +13,8 @@ def _make_forecast_fn(N: int, slope: float = -1.0, sigma: float = 0.5):
     def fn(h, *, level=0.95):
         from scipy.stats import norm
         z = norm.ppf((1 + level) / 2)
-        mean = (slope * np.arange(1, h + 1)).reshape(N, h) if N > 1 else \
-               (slope * np.arange(1, h + 1)).reshape(1, h)
+        base = slope * np.arange(1, h + 1)
+        mean = np.tile(base, (N, 1))          # (N, h)
         se = sigma * np.sqrt(np.arange(1, h + 1))
         return mean, mean - z * se, mean + z * se
     return fn

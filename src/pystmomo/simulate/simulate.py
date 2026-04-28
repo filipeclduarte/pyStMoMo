@@ -94,19 +94,16 @@ def simulate(
     # Simulate cohort effects gc_s for new cohorts                        #
     # ------------------------------------------------------------------ #
     gc_s: np.ndarray | None = None
-    new_cohort_values: list[int] = []
+    new_cohort_values: np.ndarray = np.array([], dtype=int)
 
     if fit.model.has_cohort and fit.gc is not None:
         max_fitted_cohort = int(cohorts[-1])
-        # Cohorts needed for future years and observed ages
-        for yr in years_f:
-            for age in ages:
-                c = int(yr) - int(age)
-                if c > max_fitted_cohort and c not in new_cohort_values:
-                    new_cohort_values.append(c)
-        new_cohort_values.sort()
+        # Vectorised: find all unique cohorts needed in the future grid
+        cohort_grid_f = years_f[None, :] - ages[:, None]   # (n_ages, h)
+        all_future_cohorts = np.unique(cohort_grid_f)
+        new_cohort_values = all_future_cohorts[all_future_cohorts > max_fitted_cohort]
 
-        if new_cohort_values:
+        if len(new_cohort_values) > 0:
             n_new = len(new_cohort_values)
             if isinstance(gc_method, ExternalKtForecaster):
                 gc_s_raw = gc_method.simulate(n_new, nsim, rng)  # (1, n_new, nsim)
@@ -125,45 +122,85 @@ def simulate(
                 gc_s = gc_s_raw[0]
 
     # ------------------------------------------------------------------ #
-    # Compute rates for each simulation path                              #
+    # Compute rates for all simulation paths (fully vectorised)           #
     # ------------------------------------------------------------------ #
-    # Build gc lookup: {cohort: index_in_gc_s} for new cohorts
-    new_cohort_map = {c: j for j, c in enumerate(new_cohort_values)}
-    fitted_cohort_map = {int(c): j for j, c in enumerate(cohorts)}
-
-    # rates: (n_ages, h, nsim)
-    rates = np.zeros((n_ages, h, nsim))
-
     ax = fit.ax    # (n_ages,) or None
     bx = fit.bx    # (n_ages, N)
     b0x = fit.b0x  # (n_ages,) or None
     gc_fit = fit.gc  # (n_cohorts,)
 
-    for s_idx in range(nsim):
-        kt_path = kt_s[:, :, s_idx]   # (N, h)
-        # Assemble eta for this simulation: (n_ages, h)
-        eta = np.zeros((n_ages, h))
-        if ax is not None:
-            eta += ax[:, None]
-        if bx.size > 0:
-            eta += bx @ kt_path          # (n_ages, h)
+    # eta_base: (n_ages, h) — parts that don't vary across simulations
+    eta_base = np.zeros((n_ages, h))
+    if ax is not None:
+        eta_base += ax[:, None]
 
-        if fit.model.has_cohort and b0x is not None:
-            for j_f, yr in enumerate(years_f):
-                for i, age in enumerate(ages):
-                    c = int(yr) - int(age)
-                    if c in fitted_cohort_map:
-                        gc_val = gc_fit[fitted_cohort_map[c]]
-                    elif c in new_cohort_map and gc_s is not None:
-                        gc_val = gc_s[new_cohort_map[c], s_idx]
-                    else:
-                        gc_val = 0.0
-                    eta[i, j_f] += b0x[i] * gc_val
+    # kt contribution: bx @ kt_s → (n_ages, h, nsim) via einsum
+    # bx: (n_ages, N), kt_s: (N, h, nsim)
+    if bx.size > 0 and kt_s.size > 0:
+        kt_contrib = np.einsum('aN,Nhs->ahs', bx, kt_s)  # (n_ages, h, nsim)
+    else:
+        kt_contrib = np.zeros((n_ages, h, nsim))
 
-        if link == "log":
-            rates[:, :, s_idx] = np.exp(np.clip(eta, -_CLIP, _CLIP))
+    # Cohort contribution: precompute index grid once
+    coh_contrib = np.zeros((n_ages, h, nsim))
+    if fit.model.has_cohort and b0x is not None:
+        cohort_grid_f = years_f[None, :] - ages[:, None]  # (n_ages, h)
+
+        # Build combined lookup: fitted cohorts first, then new cohorts
+        n_fitted = len(cohorts)
+        n_new = len(new_cohort_values)
+        if n_new > 0:
+            all_c = np.concatenate([cohorts.astype(int), new_cohort_values.astype(int)])
         else:
-            rates[:, :, s_idx] = invlogit(eta)
+            all_c = cohorts.astype(int)
+        c_min = int(all_c.min())
+        c_max = int(all_c.max())
+        n_total = c_max - c_min + 1
+
+        # Index grid: maps each (age, year) cell to position in all_c
+        raw_idx = (cohort_grid_f - c_min).astype(int)
+        # Sentinel for out-of-range: we'll handle separately
+        in_range = (raw_idx >= 0) & (raw_idx < n_total)
+
+        # Fitted cohort values: constant across simulations
+        # Build a (n_total,) array mapping cohort offset → gc value for fitted
+        gc_fitted_lookup = np.zeros(n_total + 1)  # +1 sentinel
+        fitted_idx = (cohorts.astype(int) - c_min).astype(int)
+        valid_fitted = (fitted_idx >= 0) & (fitted_idx < n_total)
+        gc_fitted_lookup[fitted_idx[valid_fitted]] = gc_fit[valid_fitted]
+
+        sentinel_idx = n_total
+        safe_raw_idx = np.where(in_range, raw_idx, sentinel_idx)
+        fitted_contribution = gc_fitted_lookup[safe_raw_idx]  # (n_ages, h)
+        coh_contrib += b0x[:, None, None] * fitted_contribution[:, :, None]
+
+        # New cohort values: vary across simulations
+        if n_new > 0 and gc_s is not None:
+            # gc_s: (n_new, nsim), new_cohort_values: (n_new,)
+            new_c_offsets = (new_cohort_values - c_min).astype(int)
+            # Build index: for each cell, which new cohort index (if any)?
+            # Map raw_idx → index in new_cohort_values, or -1
+            new_c_lookup = np.full(n_total + 1, -1, dtype=int)
+            for k, offset in enumerate(new_c_offsets):
+                if 0 <= offset < n_total:
+                    new_c_lookup[offset] = k
+            new_k = new_c_lookup[safe_raw_idx]  # (n_ages, h), values -1..n_new-1
+            has_new = new_k >= 0  # (n_ages, h) mask
+
+            if has_new.any():
+                # Extract (cell_i, cell_j) where new cohorts apply
+                ai, aj = np.where(has_new)
+                k_vals = new_k[ai, aj]  # which new cohort index
+                # gc_s[k_vals, :] → (n_cells, nsim)
+                coh_contrib[ai, aj, :] += b0x[ai, None] * gc_s[k_vals, :]
+
+    # Assemble: eta_base + kt_contrib + coh_contrib → rates
+    eta_all = eta_base[:, :, None] + kt_contrib + coh_contrib  # (n_ages, h, nsim)
+
+    if link == "log":
+        rates = np.exp(np.clip(eta_all, -_CLIP, _CLIP))
+    else:
+        rates = invlogit(eta_all)
 
     return SimStMoMo(
         fit=fit,

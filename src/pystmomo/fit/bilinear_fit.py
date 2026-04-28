@@ -120,11 +120,13 @@ def fit_bilinear(
     def _build_eta() -> np.ndarray:
         eta = ax[:, None] + bx @ kt                    # (n_ages, n_years)
         if b0x is not None and gc is not None:
-            for j in range(n_years):
-                for i in range(n_ages):
-                    c = int(cohort_grid[i, j])
-                    if c in cohort_map:
-                        eta[i, j] += b0x[i] * gc[cohort_map[c]]
+            # Vectorised cohort contribution
+            c_min = int(cohorts[0])
+            gc_pad = np.append(gc, 0.0)  # sentinel for out-of-range
+            idx = (cohort_grid - c_min).astype(int)
+            sentinel = len(gc)
+            idx = np.where((idx >= 0) & (idx < len(gc)), idx, sentinel)
+            eta += b0x[:, None] * gc_pad[idx]
         if link == "log":
             eta += oxt                                  # add log(E) for Poisson
         return eta
@@ -246,16 +248,16 @@ def fit_bilinear(
         )
 
     # --- Final rates and log-likelihood ---
-    eta_final = _build_eta()  # using updated ax, bx, kt, b0x, gc
-    # Recompute eta after possible constraint changes
-    eta_final = ax[:, None] + bx @ kt
-    if b0x is not None and gc is not None:
-        for j in range(n_years):
-            for i in range(n_ages):
-                c = int(cohort_grid[i, j])
-                if c in cohort_map:
-                    eta_final[i, j] += b0x[i] * gc[cohort_map[c]]
-    eta_log = eta_final + oxt  # for Poisson expected deaths
+    # Recompute eta after possible constraint changes (using vectorised _build_eta)
+    eta_final = _build_eta()
+    # For Poisson, _build_eta already adds oxt; for Binomial it does not.
+    # Split: eta_log includes offset, eta_final (for Binomial) does not.
+    if link == "log":
+        eta_log = eta_final  # _build_eta already added oxt for log link
+        eta_no_offset = eta_final - oxt
+    else:
+        eta_log = eta_final + oxt
+        eta_no_offset = eta_final
 
     if link == "log":
         fitted_deaths = np.exp(np.clip(eta_log, -_CLIP, _CLIP))
