@@ -74,10 +74,10 @@ def plot_forecast(
 
         # Historical
         if has_hist:
-            ax.plot(years_hist, kt_hist[i], color="steelblue", linewidth=1.5, label="Historical")
+            ax.plot(years_hist, kt_hist[i], label="Historical")
 
         # Forecast central
-        ax.plot(years_fc, kt_central[i], color="crimson", linewidth=1.5, label="Forecast")
+        ax.plot(years_fc, kt_central[i], label="Forecast")
 
         # Confidence bands
         if has_bands:
@@ -85,15 +85,13 @@ def plot_forecast(
                 years_fc,
                 kt_lower[i],
                 kt_upper[i],
-                color="crimson",
                 alpha=0.2,
                 label="CI",
             )
 
         ax.set_title(label)
         ax.set_xlabel("Year")
-        ax.grid(True, linestyle="--", alpha=0.4)
-        ax.legend(fontsize=8)
+        ax.legend()
 
     # Hide unused subplots
     for i in range(N, nrows * ncols):
@@ -152,16 +150,16 @@ def plot_fan(
 
     # Central (median)
     median = np.median(rates_sim, axis=1)
-    ax.plot(years_fc, median, color="crimson", linewidth=1.5, label="Median")
+    ax.plot(years_fc, median, label="Median")
 
     # Fan bands
-    colors = ["#f4a582", "#d6604d", "#b2182b"]
-    for level, color in zip(sorted(levels), colors[: len(levels)]):
+    # Using a single color with decreasing alpha for fan levels is often cleaner
+    for level in sorted(levels):
         lo_pct = 100.0 * (1.0 - level) / 2.0
         hi_pct = 100.0 - lo_pct
         lo = np.percentile(rates_sim, lo_pct, axis=1)
         hi = np.percentile(rates_sim, hi_pct, axis=1)
-        ax.fill_between(years_fc, lo, hi, color=color, alpha=0.35,
+        ax.fill_between(years_fc, lo, hi, alpha=0.15,
                         label=f"{int(level * 100)}% CI")
 
     # Historical rates (optional)
@@ -170,14 +168,12 @@ def plot_fan(
         hist_idx = np.where(hist_ages == age)[0]
         if len(hist_idx) > 0:
             hist_rates = sim.fit.fitted_rates[int(hist_idx[0]), :]
-            ax.plot(sim.fit.years, hist_rates, color="steelblue",
-                    linewidth=1.5, label="Historical (fitted)")
+            ax.plot(sim.fit.years, hist_rates, color="#64748b", label="Historical (fitted)")
 
     ax.set_xlabel("Year")
     ax.set_ylabel("Mortality rate")
     ax.set_title(f"Fan chart — age {age}")
-    ax.legend(fontsize=8)
-    ax.grid(True, linestyle="--", alpha=0.4)
+    ax.legend()
 
     fig.tight_layout()
     return fig

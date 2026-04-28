@@ -87,12 +87,11 @@ def plot_residual_scatter(fit: "FitStMoMo", kind: str = "deviance") -> Figure:
     fig = Figure(figsize=(8, 5))
     ax = fig.add_subplot(111)
 
-    ax.scatter(log_rates, residuals, s=8, alpha=0.5, color="steelblue", edgecolors="none")
-    ax.axhline(0.0, color="crimson", linewidth=1.0, linestyle="--")
+    ax.scatter(log_rates, residuals, s=12, alpha=0.4)
+    ax.axhline(0.0, color="#dc2626", linewidth=1.2, linestyle="--")
     ax.set_xlabel("Fitted log-rate")
     ax.set_ylabel(f"{kind.capitalize()} residual")
     ax.set_title(f"{kind.capitalize()} residuals vs fitted log-rates")
-    ax.grid(True, linestyle="--", alpha=0.35)
 
     fig.tight_layout()
     return fig

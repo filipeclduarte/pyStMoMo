@@ -3,16 +3,33 @@ name: Docs
 on:
   push:
     branches: [main]
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+permissions:
+  contents: write    # needed to push to gh-pages branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so mkdocs-material can show git dates
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Install docs dependencies
+          python-version: "3.12"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: docs-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install package + docs dependencies
         run: pip install -e ".[docs]"
-      - name: Build and deploy docs
+
+      - name: Build and deploy to GitHub Pages
         run: mkdocs gh-deploy --force
+        env:
+          PYTHONPATH: src

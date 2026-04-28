@@ -80,10 +80,9 @@ def plot_parameters(fit: "FitStMoMo", *, fig: Figure | None = None) -> Figure:
         row = idx // ncols
         col = idx % ncols
         ax = axes[row][col]
-        ax.plot(xvals, yvals, color="steelblue", linewidth=1.5)
+        ax.plot(xvals, yvals)
         ax.set_title(label)
         ax.set_xlabel(xlabel)
-        ax.grid(True, linestyle="--", alpha=0.4)
 
     # Hide unused axes
     for idx in range(n_panels, nrows * ncols):
