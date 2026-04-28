@@ -1554,7 +1554,7 @@ and compares predicted rates to observed rates.</p>
                 <code>fit</code>
             </td>
             <td>
-                  <code>&#39;FitStMoMo&#39;</code>
+                  <code><a class="autorefs autorefs-internal" title="pystmomo.fit.fit_result.FitStMoMo" href="../fitting/#pystmomo.FitStMoMo">FitStMoMo</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1730,7 +1730,7 @@ error on rates) or <code>"log_mse"</code> (MSE on log rates).</p>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
 <span class="normal"><a href="#__codelineno-0-105">105</a></span>
 <span class="normal"><a href="#__codelineno-0-106">106</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="k">def</span><span class="w"> </span><span class="nf">cv_stmomo</span><span class="p">(</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a>    <span class="n">fit</span><span class="p">:</span> <span class="s2">&quot;FitStMoMo&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13"></a>    <span class="n">fit</span><span class="p">:</span> <span class="n">FitStMoMo</span><span class="p">,</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14"></a>    <span class="n">n_folds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15"></a>    <span class="n">metric</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;log_mse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mse&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
