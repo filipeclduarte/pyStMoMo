@@ -1,13 +1,14 @@
 """Core StMoMo model specification class."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Literal
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
-from .age_functions import AgeFunction, NonParametricAgeFun
 from ..utils.ages_years import compute_cohorts, make_weight_matrix_fast
 from ..utils.validation import check_mortality_data
+from .age_functions import AgeFunction, NonParametricAgeFun
 
 if TYPE_CHECKING:
     from ..fit.fit_result import FitStMoMo
@@ -71,7 +72,7 @@ class StMoMo:
         self.text_formula = text_formula
 
     @property
-    def N(self) -> int:
+    def N(self) -> int:  # noqa: N802
         """Number of period terms (bilinear components)."""
         return len(self.period_age_fun)
 
@@ -102,7 +103,7 @@ class StMoMo:
         max_iter: int = 500,
         tol: float = 1e-6,
         verbose: bool = False,
-    ) -> "FitStMoMo":
+    ) -> FitStMoMo:
         """Fit the model to mortality data.
 
         Parameters

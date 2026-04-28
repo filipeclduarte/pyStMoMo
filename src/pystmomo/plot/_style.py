@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+
 
 def set_style():
     """Apply a premium, modern aesthetic to matplotlib plots."""
-    
+
     # Modern, clean color palette (harmonious HSL-based)
     # 0: Primary (Blue), 1: Secondary (Teal), 2: Accent (Indigo), 3: Danger (Red/Orange), 4: Neutral
     colors = [
@@ -14,14 +14,14 @@ def set_style():
         '#d97706', # Amber 600
         '#7c3aed', # Violet 600
     ]
-    
+
     plt.rcParams.update({
         # Figure and Layout
         'figure.figsize': (10, 6),
         'figure.facecolor': 'white',
         'figure.dpi': 100,
         'figure.autolayout': True,
-        
+
         # Typography
         'font.family': 'sans-serif',
         'font.sans-serif': ['Inter', 'Roboto', 'Helvetica', 'Arial', 'DejaVu Sans'],
@@ -33,7 +33,7 @@ def set_style():
         'xtick.labelsize': 10,
         'ytick.labelsize': 10,
         'legend.fontsize': 10,
-        
+
         # Spines and Grid
         'axes.spines.top': False,
         'axes.spines.right': False,
@@ -44,17 +44,17 @@ def set_style():
         'grid.color': '#f1f5f9', # Slate 100
         'grid.linestyle': '-',
         'grid.linewidth': 0.8,
-        
+
         # Colors and Lines
         'axes.prop_cycle': plt.cycler(color=colors),
         'lines.linewidth': 2.0,
         'lines.markersize': 6,
         'patch.edgecolor': 'none',
-        
+
         # Legend
         'legend.frameon': False,
         'legend.loc': 'best',
-        
+
         # Ticks
         'xtick.color': '#475569', # Slate 600
         'ytick.color': '#475569', # Slate 600

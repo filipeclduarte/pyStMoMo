@@ -6,7 +6,6 @@ from typing import Literal
 import numpy as np
 
 from ..fit.fit_result import FitStMoMo
-from ..utils.ages_years import compute_cohorts
 from .external import ExternalKtForecaster
 from .forecast_result import ForStMoMo
 
@@ -15,9 +14,9 @@ def forecast(
     fit: FitStMoMo,
     h: int = 50,
     *,
-    kt_method: "Literal['mrwd', 'arima'] | ExternalKtForecaster" = "mrwd",
+    kt_method: Literal['mrwd', 'arima'] | ExternalKtForecaster = "mrwd",
     kt_arima_order: tuple = (0, 1, 0),
-    gc_method: "Literal['arima', 'mrwd'] | ExternalKtForecaster" = "arima",
+    gc_method: Literal['arima', 'mrwd'] | ExternalKtForecaster = "arima",
     gc_arima_order: tuple = (1, 1, 0),
     jump_choice: Literal["fit", "actual"] = "fit",
     level: float = 0.95,
@@ -137,7 +136,9 @@ def _fit_kt_model(kt: np.ndarray, method, arima_order: tuple):
         from .arima_fc import IndependentArima
         return IndependentArima.fit(kt, order=arima_order, include_constant=True)
     else:
-        raise ValueError(f"Unknown kt_method: {method!r}. Use 'mrwd', 'arima', or ExternalKtForecaster.")
+        raise ValueError(
+            f"Unknown kt_method: {method!r}. Use 'mrwd', 'arima', or ExternalKtForecaster."
+        )
 
 
 def _fit_gc_model(gc_series: np.ndarray, method, arima_order: tuple, n_new: int):
@@ -152,7 +153,9 @@ def _fit_gc_model(gc_series: np.ndarray, method, arima_order: tuple, n_new: int)
         from .mrwd import MultivariateRandomWalkDrift
         return MultivariateRandomWalkDrift.fit(gc_2d)
     else:
-        raise ValueError(f"Unknown gc_method: {method!r}. Use 'arima', 'mrwd', or ExternalKtForecaster.")
+        raise ValueError(
+            f"Unknown gc_method: {method!r}. Use 'arima', 'mrwd', or ExternalKtForecaster."
+        )
 
 
 def _clean_gc_series(gc: np.ndarray) -> np.ndarray:
@@ -199,7 +202,7 @@ def _compute_forecast_rates(
     np.ndarray
         Forecast rates, shape (n_ages, h).
     """
-    from ..core.predictor import compute_eta, compute_rates
+    from ..core.predictor import compute_rates
 
     ages = fit.ages
     n_ages = len(ages)
@@ -243,11 +246,11 @@ def _build_gc_dict(
     """
     gc_dict: dict = {}
     # Observed cohorts
-    for c, g in zip(fit.cohorts.tolist(), fit.gc.tolist()):
+    for c, g in zip(fit.cohorts.tolist(), fit.gc.tolist(), strict=False):
         if np.isfinite(g):
             gc_dict[int(c)] = g
     # Forecast cohorts
     if gc_f is not None and len(cohorts_f) > 0:
-        for c, g in zip(cohorts_f.tolist(), gc_f.tolist()):
+        for c, g in zip(cohorts_f.tolist(), gc_f.tolist(), strict=False):
             gc_dict[int(c)] = g
     return gc_dict

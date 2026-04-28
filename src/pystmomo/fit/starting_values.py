@@ -41,10 +41,7 @@ def svd_starting_values(
     # Raw rate with continuity correction (avoids log(0))
     raw_q = (Dxt + 0.5) / np.maximum(Ext + 1.0, 1e-15)
 
-    if link == "log":
-        g_mu = np.log(np.clip(raw_q, 1e-15, None))
-    else:
-        g_mu = logit(raw_q)
+    g_mu = np.log(np.clip(raw_q, 1e-15, None)) if link == "log" else logit(raw_q)
 
     # Mask non-observed cells
     g_mu_masked = np.where(wxt > 0, g_mu, np.nan)

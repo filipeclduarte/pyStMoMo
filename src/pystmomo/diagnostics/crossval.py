@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def cv_stmomo(
-    fit: "FitStMoMo",
+    fit: FitStMoMo,
     n_folds: int = 5,
     metric: Literal["mse", "log_mse"] = "mse",
 ) -> dict:

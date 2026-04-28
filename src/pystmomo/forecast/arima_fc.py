@@ -39,7 +39,7 @@ class IndependentArima:
         kt: np.ndarray,
         order: tuple[int, int, int] = (1, 1, 0),
         include_constant: bool = True,
-    ) -> "IndependentArima":
+    ) -> IndependentArima:
         """Fit independent ARIMA models to each row of kt.
 
         Parameters
@@ -62,10 +62,7 @@ class IndependentArima:
         _, d, _ = order
         # statsmodels semantics: when d >= 1, a constant in levels corresponds
         # to a linear trend term ('t'), not 'c'.  'c' is only valid for d=0.
-        if include_constant:
-            trend = "t" if d >= 1 else "c"
-        else:
-            trend = "n"
+        trend = ("t" if d >= 1 else "c") if include_constant else "n"
 
         fitted_models = []
         for i in range(N):

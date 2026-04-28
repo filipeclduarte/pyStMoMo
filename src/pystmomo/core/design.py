@@ -40,7 +40,7 @@ class ColMap:
 
 
 def build_design_matrix(
-    model: "StMoMo",
+    model: StMoMo,
     ages: np.ndarray,
     years: np.ndarray,
     cohorts: np.ndarray,
@@ -86,7 +86,7 @@ def build_design_matrix(
 
     # --- α_x block (one dummy per age) ---
     if model.static_age_fun:
-        rows = np.arange(n_cells)[row_mask]
+        np.arange(n_cells)[row_mask]
         cols = age_idx[row_mask]
         data = np.ones(n_obs)
         ax_block = sp.csr_matrix(
@@ -97,7 +97,7 @@ def build_design_matrix(
         col_offset += n_ages
 
     # --- κ_t^(i) blocks ---
-    for i, af in enumerate(model.period_age_fun):
+    for _i, af in enumerate(model.period_age_fun):
         # af is parametric (NonParametricAgeFun triggers the other path)
         fx = af(ages)   # shape (n_ages,)
         # For each year t, one parameter κ_t^(i).  Column t gets value f_i(x)
@@ -139,10 +139,7 @@ def build_design_matrix(
         col_map.gc_cols = list(range(col_offset, col_offset + n_cohorts))
         col_offset += n_cohorts
 
-    if not blocks:
-        X = sp.csr_matrix((n_obs, 0))
-    else:
-        X = sp.hstack(blocks, format="csr")
+    X = sp.csr_matrix((n_obs, 0)) if not blocks else sp.hstack(blocks, format="csr")
 
     return X, col_map, row_mask
 
@@ -169,7 +166,7 @@ def unpack_params(
     gc:
         Shape (n_cohorts,) or None.
     """
-    n_ages, n_years, n_cohorts = col_map.n_ages, col_map.n_years, col_map.n_cohorts
+    n_ages, n_years, _n_cohorts = col_map.n_ages, col_map.n_years, col_map.n_cohorts
 
     ax: np.ndarray | None = None
     if col_map.ax_cols:

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from ..core.age_functions import ConstantAgeFun, NonParametricAgeFun
+from ..core.age_functions import NonParametricAgeFun
 from ..core.constraints import _rh_constraint
 from ..core.stmomo import StMoMo
 

@@ -1,14 +1,14 @@
 from .age_functions import (
     AgeFunction,
-    NonParametricAgeFun,
+    CallableAgeFun,
+    CenteredCohortAgeFun,
     ConstantAgeFun,
     LinearAgeFun,
+    NonParametricAgeFun,
     QuadraticAgeFun,
-    CenteredCohortAgeFun,
-    CallableAgeFun,
 )
+from .predictor import compute_eta, compute_rates, invlogit, logit
 from .stmomo import StMoMo
-from .predictor import compute_eta, compute_rates, logit, invlogit
 
 __all__ = [
     "AgeFunction",

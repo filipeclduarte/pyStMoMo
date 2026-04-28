@@ -1,7 +1,7 @@
 """Residual plots for fitted StMoMo models."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib.figure import Figure
@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 _VALID_KINDS = ("deviance", "pearson", "response")
 
 
-def _get_residuals(fit: "FitStMoMo", kind: str) -> np.ndarray:
+def _get_residuals(fit: FitStMoMo, kind: str) -> np.ndarray:
     if kind not in _VALID_KINDS:
         raise ValueError(f"kind must be one of {_VALID_KINDS}, got {kind!r}")
     return fit.residuals(kind=kind)
 
 
-def plot_residual_heatmap(fit: "FitStMoMo", kind: str = "deviance") -> Figure:
+def plot_residual_heatmap(fit: FitStMoMo, kind: str = "deviance") -> Figure:
     """Heatmap of residuals on the ages × years grid.
 
     Uses matplotlib ``imshow`` with the RdBu_r colormap, centred at zero.
@@ -61,7 +61,7 @@ def plot_residual_heatmap(fit: "FitStMoMo", kind: str = "deviance") -> Figure:
     return fig
 
 
-def plot_residual_scatter(fit: "FitStMoMo", kind: str = "deviance") -> Figure:
+def plot_residual_scatter(fit: FitStMoMo, kind: str = "deviance") -> Figure:
     """Residuals vs fitted log-rates scatter plot.
 
     Parameters

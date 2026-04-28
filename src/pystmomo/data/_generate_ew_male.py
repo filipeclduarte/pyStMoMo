@@ -15,9 +15,10 @@ Run this script from the repo root to regenerate the CSVs:
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 AGES = np.arange(0, 101)
 YEARS = np.arange(1961, 2012)
@@ -85,10 +86,7 @@ def generate_ew_male_data(noise: bool = True) -> tuple[np.ndarray, np.ndarray]:
         Ext[i, :] = base * (1 + 0.002 * np.arange(N_YEARS))
 
     expected_deaths = mu * Ext
-    if noise:
-        Dxt = RNG.poisson(expected_deaths).astype(float)
-    else:
-        Dxt = expected_deaths
+    Dxt = RNG.poisson(expected_deaths).astype(float) if noise else expected_deaths
 
     return Dxt, Ext
 

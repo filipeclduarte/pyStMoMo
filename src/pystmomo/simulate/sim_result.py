@@ -39,7 +39,7 @@ class SimStMoMo:
         Random seed used (for reproducibility).
     """
 
-    fit: "FitStMoMo"
+    fit: FitStMoMo
     h: int
     nsim: int
     rates: np.ndarray         # (n_ages, h, nsim)

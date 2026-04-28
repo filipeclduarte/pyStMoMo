@@ -36,10 +36,10 @@ class BootStMoMo:
         Bootstrap distribution of γ_c, shape (nboot, n_cohorts) or None.
     """
 
-    base_fit: "FitStMoMo"
+    base_fit: FitStMoMo
     nboot: int
     method: Literal["semiparametric", "residual"]
-    fits: list["FitStMoMo"] = field(default_factory=list)
+    fits: list[FitStMoMo] = field(default_factory=list)
 
     @property
     def ax_b(self) -> np.ndarray | None:

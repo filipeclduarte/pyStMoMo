@@ -43,7 +43,7 @@ class MultivariateRandomWalkDrift:
         self.n_years = n_years
 
     @classmethod
-    def fit(cls, kt: np.ndarray) -> "MultivariateRandomWalkDrift":
+    def fit(cls, kt: np.ndarray) -> MultivariateRandomWalkDrift:
         """Fit MRWD to observed period indexes.
 
         Parameters

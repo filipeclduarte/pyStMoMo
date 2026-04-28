@@ -87,7 +87,7 @@ def _cohort_index_matrix(
         Shape (n_ages, n_years).  Cells where cohort is outside *cohorts* are
         set to 0.0 (will be masked by wxt).
     """
-    cohort_to_gc = dict(zip(cohorts.tolist(), gc.tolist()))
+    cohort_to_gc = dict(zip(cohorts.tolist(), gc.tolist(), strict=False))
     mat = np.zeros((len(ages), len(years)))
     for j, yr in enumerate(years):
         for i, age in enumerate(ages):

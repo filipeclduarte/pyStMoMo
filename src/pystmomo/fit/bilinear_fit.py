@@ -22,12 +22,14 @@ from __future__ import annotations
 
 import numpy as np
 
+from ..core.age_functions import NonParametricAgeFun
 from ..core.predictor import invlogit
 from ..core.stmomo import StMoMo
-from ..core.age_functions import NonParametricAgeFun
 from .families import (
-    poisson_deviance, binomial_deviance,
-    poisson_loglik, binomial_loglik,
+    binomial_deviance,
+    binomial_loglik,
+    poisson_deviance,
+    poisson_loglik,
 )
 from .fit_result import FitStMoMo
 from .starting_values import svd_starting_values
@@ -199,7 +201,7 @@ def fit_bilinear(
                 )
                 gc[cj] += step
                 # Update η for cells in this cohort
-                for ii, jj in zip(rows_in_c, cols_in_c):
+                for ii, jj in zip(rows_in_c, cols_in_c, strict=False):
                     eta[ii, jj] += b0x[ii] * step
                     edeath[ii, jj] = _expected_deaths(
                         np.array([eta[ii, jj]]), link, np.array([Ext[ii, jj]])

@@ -103,7 +103,8 @@ def _irls_pinv(
 
         # Convergence on deviance
         if link == "log":
-            dev = poisson_deviance(y, np.exp(np.clip(X @ new_params + offset_, -_CLIP, _CLIP)), freq_weights)
+            eta_new = np.clip(X @ new_params + offset_, -_CLIP, _CLIP)
+            dev = poisson_deviance(y, np.exp(eta_new), freq_weights)
         else:
             q_new = 1.0 / (1.0 + np.exp(-np.clip(X @ new_params + offset_, -_CLIP, _CLIP)))
             dev = binomial_deviance(y, q_new, Ext, freq_weights)

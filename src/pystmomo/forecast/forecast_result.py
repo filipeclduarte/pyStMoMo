@@ -48,7 +48,7 @@ class ForStMoMo:
         The fitted model used to project gc, or None.
     """
 
-    fit: "FitStMoMo"
+    fit: FitStMoMo
     h: int
     years_f: np.ndarray
     cohorts_f: np.ndarray

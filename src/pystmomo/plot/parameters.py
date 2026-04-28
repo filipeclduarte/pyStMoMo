@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ..fit.fit_result import FitStMoMo
 
 
-def plot_parameters(fit: "FitStMoMo", *, fig: Figure | None = None) -> Figure:
+def plot_parameters(fit: FitStMoMo, *, fig: Figure | None = None) -> Figure:
     """Multi-panel plot of fitted model parameters.
 
     Panels shown (only for non-None arrays):

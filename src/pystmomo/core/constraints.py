@@ -154,7 +154,7 @@ def _m7_constraint(
         coef, _, _, _ = np.linalg.lstsq(A, gc, rcond=None)
         gc -= A @ coef
         # Redistribute into period indexes
-        t_float = years.astype(float) - years.mean()
+        years.astype(float) - years.mean()
         kt[0] += coef[0] + coef[1] * years.astype(float) + coef[2] * years.astype(float) ** 2
         # (The exact redistribution depends on the M7 predictor structure;
         #  this approximation preserves the linear predictor η_xt.)

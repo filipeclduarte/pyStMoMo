@@ -40,7 +40,7 @@ Example
 """
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 
@@ -140,4 +140,5 @@ class ExternalKtForecaster:
 
     def __repr__(self) -> str:
         has_sim = self._simulate_fn is not None
-        return f"ExternalKtForecaster(simulate={'yes' if has_sim else 'no (deterministic fallback)'})"
+        label = "yes" if has_sim else "no (deterministic fallback)"
+        return f"ExternalKtForecaster(simulate={label})"

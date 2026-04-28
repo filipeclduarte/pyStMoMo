@@ -1,6 +1,6 @@
 """Diagnostics for fitted StMoMo models."""
-from .residuals import deviance_residuals, pearson_residuals, response_residuals
 from .crossval import cv_stmomo
+from .residuals import deviance_residuals, pearson_residuals, response_residuals
 
 __all__ = [
     "deviance_residuals",

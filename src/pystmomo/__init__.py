@@ -17,43 +17,28 @@ Quick start
 """
 from __future__ import annotations
 
-# ── Data ──────────────────────────────────────────────────────────────────────
-from .data._loader import StMoMoData, load_ew_male, load_hmd_csv
+# ── Version ───────────────────────────────────────────────────────────────────
+from ._version import __version__
+from .bootstrap.boot_result import BootStMoMo
+from .bootstrap.residual_boot import residual_bootstrap
+from .bootstrap.semipar_boot import semiparametric_bootstrap
 
 # ── Core age-functions ────────────────────────────────────────────────────────
 from .core.age_functions import (
-    NonParametricAgeFun,
+    CallableAgeFun,
+    CenteredCohortAgeFun,
     ConstantAgeFun,
     LinearAgeFun,
+    NonParametricAgeFun,
     QuadraticAgeFun,
-    CenteredCohortAgeFun,
-    CallableAgeFun,
 )
 
 # ── Model specification ───────────────────────────────────────────────────────
 from .core.stmomo import StMoMo
 
-# ── Pre-built models ──────────────────────────────────────────────────────────
-from .models.lc import lc
-from .models.cbd import cbd
-from .models.apc import apc
-from .models.rh import rh
-from .models.m6 import m6
-from .models.m7 import m7
-from .models.m8 import m8
-
-# ── Results ───────────────────────────────────────────────────────────────────
-from .fit.fit_result import FitStMoMo
-from .forecast.forecast_result import ForStMoMo
-from .simulate.sim_result import SimStMoMo
-from .bootstrap.boot_result import BootStMoMo
-
-# ── High-level operations ─────────────────────────────────────────────────────
-from .forecast.forecast import forecast
-from .forecast.external import ExternalKtForecaster
-from .simulate.simulate import simulate
-from .bootstrap.semipar_boot import semiparametric_bootstrap
-from .bootstrap.residual_boot import residual_bootstrap
+# ── Data ──────────────────────────────────────────────────────────────────────
+from .data._loader import StMoMoData, load_ew_male, load_hmd_csv
+from .diagnostics.crossval import cv_stmomo
 
 # ── Diagnostics ───────────────────────────────────────────────────────────────
 from .diagnostics.residuals import (
@@ -61,15 +46,30 @@ from .diagnostics.residuals import (
     pearson_residuals,
     response_residuals,
 )
-from .diagnostics.crossval import cv_stmomo
+
+# ── Results ───────────────────────────────────────────────────────────────────
+from .fit.fit_result import FitStMoMo
+from .forecast.external import ExternalKtForecaster
+
+# ── High-level operations ─────────────────────────────────────────────────────
+from .forecast.forecast import forecast
+from .forecast.forecast_result import ForStMoMo
+from .models.apc import apc
+from .models.cbd import cbd
+
+# ── Pre-built models ──────────────────────────────────────────────────────────
+from .models.lc import lc
+from .models.m6 import m6
+from .models.m7 import m7
+from .models.m8 import m8
+from .models.rh import rh
+from .plot.forecast_plot import plot_fan, plot_forecast
 
 # ── Plotting ──────────────────────────────────────────────────────────────────
 from .plot.parameters import plot_parameters
-from .plot.forecast_plot import plot_forecast, plot_fan
 from .plot.residual_plot import plot_residual_heatmap, plot_residual_scatter
-
-# ── Version ───────────────────────────────────────────────────────────────────
-from ._version import __version__
+from .simulate.sim_result import SimStMoMo
+from .simulate.simulate import simulate
 
 __all__ = [
     # data

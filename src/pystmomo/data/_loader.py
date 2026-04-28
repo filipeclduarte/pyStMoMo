@@ -50,7 +50,7 @@ class StMoMoData:
     def n_years(self) -> int:
         return len(self.years)
 
-    def central2initial(self) -> "StMoMoData":
+    def central2initial(self) -> StMoMoData:
         """Convert central exposures to initial exposures.
 
         Uses the approximation ``E_xt^0 ≈ E_xt^c + 0.5 * D_xt``, which is
@@ -78,7 +78,7 @@ class StMoMoData:
         self,
         ages: np.ndarray | list[int] | None = None,
         years: np.ndarray | list[int] | None = None,
-    ) -> "StMoMoData":
+    ) -> StMoMoData:
         """Return a subset of the data restricted to given ages and/or years."""
         age_idx = (
             np.isin(self.ages, ages)
@@ -147,10 +147,7 @@ def load_ew_male(
     all_ages = dxt.index.to_numpy(dtype=int)
     all_years = dxt.columns.to_numpy(dtype=int)
 
-    if ages is None:
-        ages_sel = np.arange(55, 90)
-    else:
-        ages_sel = np.asarray(ages, dtype=int)
+    ages_sel = np.arange(55, 90) if ages is None else np.asarray(ages, dtype=int)
 
     years_sel = np.asarray(years, dtype=int) if years is not None else all_years
 

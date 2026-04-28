@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 
 if TYPE_CHECKING:
+    from ..bootstrap.boot_result import BootStMoMo
     from ..core.stmomo import StMoMo
     from ..forecast.forecast_result import ForStMoMo
     from ..simulate.sim_result import SimStMoMo
-    from ..bootstrap.boot_result import BootStMoMo
 
 
 class FitStMoMo:
@@ -61,7 +61,7 @@ class FitStMoMo:
 
     def __init__(
         self,
-        model: "StMoMo",
+        model: StMoMo,
         ax: np.ndarray | None,
         bx: np.ndarray,
         kt: np.ndarray,
@@ -132,7 +132,11 @@ class FitStMoMo:
         np.ndarray
             Residual matrix, shape (n_ages, n_years).  Masked cells are 0.
         """
-        from ..diagnostics.residuals import deviance_residuals, pearson_residuals, response_residuals
+        from ..diagnostics.residuals import (
+            deviance_residuals,
+            pearson_residuals,
+            response_residuals,
+        )
 
         if kind == "deviance":
             return deviance_residuals(self)
@@ -155,7 +159,7 @@ class FitStMoMo:
         gc_method: Literal["arima", "mrwd"] = "arima",
         level: float = 0.95,
         **kwargs,
-    ) -> "ForStMoMo":
+    ) -> ForStMoMo:
         """Forecast future mortality rates.  See :func:`~pystmomo.forecast.forecast`."""
         from ..forecast.forecast import forecast
         return forecast(self, h=h, kt_method=kt_method, gc_method=gc_method,
@@ -168,7 +172,7 @@ class FitStMoMo:
         *,
         seed: int | None = None,
         **kwargs,
-    ) -> "SimStMoMo":
+    ) -> SimStMoMo:
         """Simulate future mortality trajectories.  See :func:`~pystmomo.simulate.simulate`."""
         from ..simulate.simulate import simulate
         return simulate(self, nsim=nsim, h=h, seed=seed, **kwargs)
@@ -179,10 +183,10 @@ class FitStMoMo:
         *,
         method: Literal["semiparametric", "residual"] = "semiparametric",
         **kwargs,
-    ) -> "BootStMoMo":
+    ) -> BootStMoMo:
         """Bootstrap parameter uncertainty.  See :func:`~pystmomo.bootstrap`."""
-        from ..bootstrap.semipar_boot import semiparametric_bootstrap
         from ..bootstrap.residual_boot import residual_bootstrap
+        from ..bootstrap.semipar_boot import semiparametric_bootstrap
         if method == "semiparametric":
             return semiparametric_bootstrap(self, nboot=nboot, **kwargs)
         else:

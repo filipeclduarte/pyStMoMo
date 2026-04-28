@@ -5,8 +5,10 @@ predictor:  η_xt = α_x + Σ_i f_i(x) κ_t^(i) + f_0(x) γ_{t-x}.
 """
 from __future__ import annotations
 
-import numpy as np
+from collections.abc import Callable
 from typing import Protocol, runtime_checkable
+
+import numpy as np
 
 
 @runtime_checkable
@@ -135,7 +137,7 @@ class CallableAgeFun:
 
     is_parametric: bool = True
 
-    def __init__(self, fn: "Callable[[np.ndarray], np.ndarray]", name: str = "custom") -> None:
+    def __init__(self, fn: Callable[[np.ndarray], np.ndarray], name: str = "custom") -> None:
         self._fn = fn
         self._name = name
 
