@@ -1,8 +1,8 @@
 site_name: pyStMoMo
 site_description: Stochastic Mortality Modelling in Python
 site_author: Filipe Duarte
-repo_url: https://github.com/filipeduarte/pyStMoMo
-repo_name: filipeduarte/pyStMoMo
+repo_url: https://github.com/filipeclduarte/pyStMoMo
+repo_name: filipeclduarte/pyStMoMo
 docs_dir: docs
 
 theme:
@@ -60,18 +60,22 @@ nav:
   - Home: index.md
   - Theory:
       - GAPC Framework: theory/gapc.md
+      - Link Functions — μ vs q: theory/link_functions.md
       - Identifiability: theory/identifiability.md
       - Forecasting & Uncertainty: theory/uncertainty.md
   - User Guide:
       - Getting Started: user_guide/quickstart.md
       - Lee-Carter Model: user_guide/lee_carter.md
       - CBD Family: user_guide/cbd_family.md
+      - Rates vs Probabilities: user_guide/rates_vs_probs.md
       - Forecasting: user_guide/forecasting.md
+      - External Forecasters: user_guide/external_forecasters.md
       - Bootstrap: user_guide/bootstrap.md
   - API Reference:
       - Models: api/models.md
       - Fitting: api/fitting.md
       - Forecasting: api/forecasting.md
+      - External Forecasters: api/external.md
       - Simulation: api/simulation.md
       - Bootstrap: api/bootstrap.md
       - Diagnostics: api/diagnostics.md

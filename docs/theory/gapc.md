@@ -18,21 +18,26 @@ where:
 
 ## Link Functions
 
-### Poisson (log link)
+The choice of link function determines what quantity the model estimates and
+what type of exposure $E_{xt}$ should be used.  See
+[Link Functions — μ vs q](link_functions.md) for full details, conversion
+formulas, and practical guidance.
+
+### Poisson (log link) — central mortality rate
 
 $$
 D_{xt} \sim \text{Poisson}(E_{xt}\, \mu_{xt}), \quad \log(\mu_{xt}) = \eta_{xt}
 $$
 
-Used by: LC, APC, RH.
+`fitted_rates` returns $\mu_{xt}$ (deaths per person-year).  Used by: **LC, APC, RH**.
 
-### Binomial (logit link)
+### Binomial (logit link) — probability of death
 
 $$
 D_{xt} \sim \text{Binomial}(E_{xt},\, q_{xt}), \quad \text{logit}(q_{xt}) = \eta_{xt}
 $$
 
-Used by: CBD, M6, M7, M8.
+`fitted_rates` returns $q_{xt} \in (0,1)$.  Used by: **CBD, M6, M7, M8**.
 
 ## Age Functions
 

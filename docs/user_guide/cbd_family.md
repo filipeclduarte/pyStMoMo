@@ -1,5 +1,12 @@
 # CBD Family
 
+!!! info "Probability of death, not mortality rate"
+    CBD-family models use the **logit link** and the **Binomial** distribution.
+    `fit.fitted_rates` and `fc.rates` return the **probability of death** $q_{xt}$,
+    not the central mortality rate $\mu_{xt}$.  See
+    [Rates vs Probabilities](rates_vs_probs.md) for conversion formulas and
+    guidance on exposure type.
+
 ## CBD (Cairns-Blake-Dowd 2006)
 
 $$\text{logit}(q_{xt}) = \kappa_t^{(1)} + (x - \bar{x})\,\kappa_t^{(2)}$$
