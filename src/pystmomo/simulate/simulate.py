@@ -7,6 +7,7 @@ import numpy as np
 
 from ..core.predictor import invlogit
 from ..fit.fit_result import FitStMoMo
+from ..forecast.external import ExternalKtForecaster
 from .sim_result import SimStMoMo
 
 _CLIP = 30.0
@@ -18,9 +19,9 @@ def simulate(
     nsim: int = 1000,
     h: int = 50,
     *,
-    kt_method: Literal["mrwd", "arima"] = "mrwd",
+    kt_method: "Literal['mrwd', 'arima'] | ExternalKtForecaster" = "mrwd",
     kt_arima_order: tuple[int, int, int] = (0, 1, 0),
-    gc_method: Literal["arima", "mrwd"] = "arima",
+    gc_method: "Literal['arima', 'mrwd'] | ExternalKtForecaster" = "arima",
     gc_arima_order: tuple[int, int, int] = (1, 1, 0),
     jump_choice: Literal["fit", "actual"] = "fit",
     seed: int | None = None,
@@ -78,6 +79,8 @@ def simulate(
     # ------------------------------------------------------------------ #
     if fit.model.N == 0:
         kt_s = np.zeros((0, h, nsim))
+    elif isinstance(kt_method, ExternalKtForecaster):
+        kt_s = kt_method.simulate(h, nsim, rng)
     elif kt_method == "mrwd":
         from ..forecast.mrwd import MultivariateRandomWalkDrift
         kt_model = MultivariateRandomWalkDrift.fit(fit.kt)
@@ -105,20 +108,21 @@ def simulate(
 
         if new_cohort_values:
             n_new = len(new_cohort_values)
-            if gc_method == "arima":
+            if isinstance(gc_method, ExternalKtForecaster):
+                gc_s_raw = gc_method.simulate(n_new, nsim, rng)  # (1, n_new, nsim)
+                gc_s = gc_s_raw[0]
+            elif gc_method == "arima":
                 from ..forecast.arima_fc import IndependentArima
-                # Fit ARIMA on the observed gc series (trim short edges)
-                gc_series = fit.gc
-                gc_2d = gc_series[np.newaxis, :]  # (1, n_cohorts)
+                gc_2d = fit.gc[np.newaxis, :]
                 gc_model_obj = IndependentArima.fit(gc_2d, order=gc_arima_order)
-                gc_sim_raw = gc_model_obj.simulate(n_new, nsim, rng)  # (1, n_new, nsim)
-                gc_s = gc_sim_raw[0]  # (n_new, nsim)
+                gc_sim_raw = gc_model_obj.simulate(n_new, nsim, rng)
+                gc_s = gc_sim_raw[0]
             else:
                 from ..forecast.mrwd import MultivariateRandomWalkDrift
                 gc_2d = fit.gc[np.newaxis, :]
                 gc_model_obj = MultivariateRandomWalkDrift.fit(gc_2d)
-                gc_s_raw = gc_model_obj.simulate(n_new, nsim, rng)  # (1, n_new, nsim)
-                gc_s = gc_s_raw[0]   # (n_new, nsim)
+                gc_s_raw = gc_model_obj.simulate(n_new, nsim, rng)
+                gc_s = gc_s_raw[0]
 
     # ------------------------------------------------------------------ #
     # Compute rates for each simulation path                              #

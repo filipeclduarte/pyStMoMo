@@ -7,6 +7,7 @@ import numpy as np
 
 from ..fit.fit_result import FitStMoMo
 from ..utils.ages_years import compute_cohorts
+from .external import ExternalKtForecaster
 from .forecast_result import ForStMoMo
 
 
@@ -14,9 +15,9 @@ def forecast(
     fit: FitStMoMo,
     h: int = 50,
     *,
-    kt_method: Literal["mrwd", "arima"] = "mrwd",
+    kt_method: "Literal['mrwd', 'arima'] | ExternalKtForecaster" = "mrwd",
     kt_arima_order: tuple = (0, 1, 0),
-    gc_method: Literal["arima", "mrwd"] = "arima",
+    gc_method: "Literal['arima', 'mrwd'] | ExternalKtForecaster" = "arima",
     gc_arima_order: tuple = (1, 1, 0),
     jump_choice: Literal["fit", "actual"] = "fit",
     level: float = 0.95,
@@ -125,8 +126,10 @@ def forecast(
 # Internal helpers
 # ------------------------------------------------------------------ #
 
-def _fit_kt_model(kt: np.ndarray, method: str, arima_order: tuple):
-    """Fit MRWD or ARIMA to period indexes."""
+def _fit_kt_model(kt: np.ndarray, method, arima_order: tuple):
+    """Fit (or return) a kt forecaster."""
+    if isinstance(method, ExternalKtForecaster):
+        return method
     if method == "mrwd":
         from .mrwd import MultivariateRandomWalkDrift
         return MultivariateRandomWalkDrift.fit(kt)
@@ -134,12 +137,13 @@ def _fit_kt_model(kt: np.ndarray, method: str, arima_order: tuple):
         from .arima_fc import IndependentArima
         return IndependentArima.fit(kt, order=arima_order, include_constant=True)
     else:
-        raise ValueError(f"Unknown kt_method: {method!r}. Use 'mrwd' or 'arima'.")
+        raise ValueError(f"Unknown kt_method: {method!r}. Use 'mrwd', 'arima', or ExternalKtForecaster.")
 
 
-def _fit_gc_model(gc_series: np.ndarray, method: str, arima_order: tuple, n_new: int):
-    """Fit ARIMA or MRWD to a 1-D cohort-index series."""
-    # Reshape to (1, n_obs) so both MRWD and IndependentArima accept it
+def _fit_gc_model(gc_series: np.ndarray, method, arima_order: tuple, n_new: int):
+    """Fit (or return) a gc forecaster."""
+    if isinstance(method, ExternalKtForecaster):
+        return method
     gc_2d = gc_series.reshape(1, -1)
     if method == "arima":
         from .arima_fc import IndependentArima
@@ -148,7 +152,7 @@ def _fit_gc_model(gc_series: np.ndarray, method: str, arima_order: tuple, n_new:
         from .mrwd import MultivariateRandomWalkDrift
         return MultivariateRandomWalkDrift.fit(gc_2d)
     else:
-        raise ValueError(f"Unknown gc_method: {method!r}. Use 'arima' or 'mrwd'.")
+        raise ValueError(f"Unknown gc_method: {method!r}. Use 'arima', 'mrwd', or ExternalKtForecaster.")
 
 
 def _clean_gc_series(gc: np.ndarray) -> np.ndarray:

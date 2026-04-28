@@ -50,6 +50,7 @@ from .bootstrap.boot_result import BootStMoMo
 
 # ── High-level operations ─────────────────────────────────────────────────────
 from .forecast.forecast import forecast
+from .forecast.external import ExternalKtForecaster
 from .simulate.simulate import simulate
 from .bootstrap.semipar_boot import semiparametric_bootstrap
 from .bootstrap.residual_boot import residual_bootstrap
@@ -100,6 +101,7 @@ __all__ = [
     # operations
     "forecast",
     "simulate",
+    "ExternalKtForecaster",
     "semiparametric_bootstrap",
     "residual_bootstrap",
     # diagnostics
