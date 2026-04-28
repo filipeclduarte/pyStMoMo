@@ -251,13 +251,8 @@ def fit_bilinear(
     # Recompute eta after possible constraint changes (using vectorised _build_eta)
     eta_final = _build_eta()
     # For Poisson, _build_eta already adds oxt; for Binomial it does not.
-    # Split: eta_log includes offset, eta_final (for Binomial) does not.
-    if link == "log":
-        eta_log = eta_final  # _build_eta already added oxt for log link
-        eta_no_offset = eta_final - oxt
-    else:
-        eta_log = eta_final + oxt
-        eta_no_offset = eta_final
+    # Split: eta_log includes offset
+    eta_log = eta_final if link == "log" else eta_final + oxt
 
     if link == "log":
         fitted_deaths = np.exp(np.clip(eta_log, -_CLIP, _CLIP))

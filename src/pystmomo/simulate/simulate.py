@@ -147,7 +147,6 @@ def simulate(
         cohort_grid_f = years_f[None, :] - ages[:, None]  # (n_ages, h)
 
         # Build combined lookup: fitted cohorts first, then new cohorts
-        n_fitted = len(cohorts)
         n_new = len(new_cohort_values)
         if n_new > 0:
             all_c = np.concatenate([cohorts.astype(int), new_cohort_values.astype(int)])
@@ -197,10 +196,7 @@ def simulate(
     # Assemble: eta_base + kt_contrib + coh_contrib → rates
     eta_all = eta_base[:, :, None] + kt_contrib + coh_contrib  # (n_ages, h, nsim)
 
-    if link == "log":
-        rates = np.exp(np.clip(eta_all, -_CLIP, _CLIP))
-    else:
-        rates = invlogit(eta_all)
+    rates = np.exp(np.clip(eta_all, -_CLIP, _CLIP)) if link == "log" else invlogit(eta_all)
 
     return SimStMoMo(
         fit=fit,
