@@ -66,6 +66,7 @@ from .models.rh import rh
 from .plot.forecast_plot import plot_fan, plot_forecast
 
 # ── Plotting ──────────────────────────────────────────────────────────────────
+from .plot._style import set_style
 from .plot.parameters import plot_parameters
 from .plot.residual_plot import plot_residual_heatmap, plot_residual_scatter
 from .simulate.sim_result import SimStMoMo
@@ -110,6 +111,7 @@ __all__ = [
     "response_residuals",
     "cv_stmomo",
     # plotting
+    "set_style",
     "plot_parameters",
     "plot_forecast",
     "plot_fan",
