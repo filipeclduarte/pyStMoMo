@@ -1,0 +1,5 @@
+# Fitting
+
+## FitStMoMo
+
+::: pystmomo.FitStMoMo

@@ -1,0 +1,79 @@
+site_name: pyStMoMo
+site_description: Stochastic Mortality Modelling in Python
+site_author: Filipe Duarte
+repo_url: https://github.com/filipeduarte/pyStMoMo
+repo_name: filipeduarte/pyStMoMo
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [../src]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_bases: true
+  - mkdocs-jupyter:
+      execute: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Theory:
+      - GAPC Framework: theory/gapc.md
+      - Identifiability: theory/identifiability.md
+      - Forecasting & Uncertainty: theory/uncertainty.md
+  - User Guide:
+      - Getting Started: user_guide/quickstart.md
+      - Lee-Carter Model: user_guide/lee_carter.md
+      - CBD Family: user_guide/cbd_family.md
+      - Forecasting: user_guide/forecasting.md
+      - Bootstrap: user_guide/bootstrap.md
+  - API Reference:
+      - Models: api/models.md
+      - Fitting: api/fitting.md
+      - Forecasting: api/forecasting.md
+      - Simulation: api/simulation.md
+      - Bootstrap: api/bootstrap.md
+      - Diagnostics: api/diagnostics.md
+      - Plotting: api/plotting.md
+      - Data: api/data.md
