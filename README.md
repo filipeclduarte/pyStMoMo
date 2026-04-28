@@ -42,14 +42,14 @@ pip install pystmomo
 ### From source
 
 ```bash
-git clone https://github.com/filipeduarte/pyStMoMo
+git clone https://github.com/filipeclduarte/pyStMoMo
 cd pyStMoMo
 pip install -e ".[dev]"
 ```
 
 ## Documentation
 
-Full documentation at <https://filipeduarte.github.io/pyStMoMo>.
+Full documentation at <https://filipeclduarte.github.io/pyStMoMo>.
 
 ## References
 
